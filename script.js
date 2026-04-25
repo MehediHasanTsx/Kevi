@@ -22,7 +22,7 @@ if (menuToggle && mobileNav) {
 }
 
 // =========================================================
-// Pricing switcher (monthly / yearly)
+// Pricing switcher (monthly / yearly) with animation
 // =========================================================
 const pricingButtons = document.querySelectorAll('.toggle-option');
 const priceAmounts = document.querySelectorAll('.amount');
@@ -35,7 +35,12 @@ pricingButtons.forEach((button) => {
     button.classList.add('active');
 
     priceAmounts.forEach((amount) => {
-      amount.textContent = amount.dataset[billing];
+      // Quick fade effect on price change
+      amount.style.opacity = '0';
+      setTimeout(() => {
+        amount.textContent = amount.dataset[billing];
+        amount.style.opacity = '1';
+      }, 180);
     });
   });
 });
@@ -108,11 +113,31 @@ const observer = new IntersectionObserver(
     });
   },
   {
-    threshold: 0.15,
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px',
   }
 );
 
 revealElements.forEach((element) => observer.observe(element));
+
+// =========================================================
+// Smooth scroll for anchor links (enhanced)
+// =========================================================
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+  anchor.addEventListener('click', function (e) {
+    const targetId = this.getAttribute('href');
+    if (targetId === '#') return;
+
+    const targetElement = document.querySelector(targetId);
+    if (targetElement) {
+      e.preventDefault();
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  });
+});
 
 // =========================================================
 // Demo newsletter interaction
@@ -131,7 +156,37 @@ if (newsletterForm) {
       return;
     }
 
-    alert(`Thanks! ${value} has been added to the list.`);
-    newsletterForm.reset();
+    // Create a success message
+    const btn = newsletterForm.querySelector('button');
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Subscribed!';
+    btn.style.pointerEvents = 'none';
+    input.value = '';
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.style.pointerEvents = '';
+    }, 2500);
   });
+}
+
+// =========================================================
+// Header scroll shadow enhancement
+// =========================================================
+const header = document.querySelector('.site-header');
+
+if (header) {
+  let lastScroll = 0;
+
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.scrollY;
+
+    if (currentScroll > 60) {
+      header.style.boxShadow = '0 8px 40px rgba(35, 18, 24, 0.12)';
+    } else {
+      header.style.boxShadow = '';
+    }
+
+    lastScroll = currentScroll;
+  }, { passive: true });
 }
